@@ -1,0 +1,70 @@
+{
+  "name": "joshua-template",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --mode content",
+    "build": "vue-tsc && vite build --mode dev",
+    "be": "pnpm run b:e",
+    "bw": "pnpm run build:watch",
+    "build:extension": "vite build --mode popup && vue-tsc && vite build --mode content && vite build --mode background && node build.js",
+    "build:watch": "vue-tsc && vite build --watch --mode popup & vite build --watch --mode content & vite build --watch --mode background & node build.js",
+    "lint": "eslint . --ext .vue,.js,.ts,.jsx,.tsx --fix",
+    "lint:script": "eslint --fix --ext .js --ext .ts --ext .vue src/",
+    "lint:stylelint": "stylelint --cache --fix \"**/*.{vue,less,postcss,css,scss}\" --cache --cache-location node_modules/.cache/stylelint/",
+    "lint:prettierrc": "prettier --write .",
+    "preview": "vite preview"
+  },
+  "lint-staged": {
+    "src/**/*.{js,ts,vue}": [
+      "pnpm run lint:script",
+      "pnpm run lint:prettierrc",
+      "git add ."
+    ]
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "dependencies": {
+    "@commitlint/cli": "^18.4.4",
+    "@commitlint/config-conventional": "^18.4.4",
+    "axios": "^1.6.5",
+    "pinia": "^2.1.7",
+    "sass": "^1.69.7",
+    "unplugin-auto-import": "^0.17.3",
+    "vue-router": "^4.2.5"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.4",
+    "@typescript-eslint/eslint-plugin": "^6.19.0",
+    "@typescript-eslint/parser": "^6.19.0",
+    "@vitejs/plugin-vue": "^4.5.2",
+    "autoprefixer": "^10.4.16",
+    "boxen": "^7.1.1",
+    "chalk": "^5.3.0",
+    "concurrently": "^8.2.2",
+    "eslint": "^8.56.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-prettier": "^5.1.3",
+    "eslint-plugin-vue": "^9.20.1",
+    "husky": "^8.0.3",
+    "lint-staged": "^15.2.0",
+    "npm-run-all": "^4.1.5",
+    "postcss": "^8.4.33",
+    "prettier": "^3.2.2",
+    "stylelint": "^16.1.0",
+    "stylelint-config-prettier": "^9.0.5",
+    "stylelint-config-standard": "^36.0.0",
+    "stylelint-order": "^6.0.4",
+    "tailwindcss": "^3.4.1",
+    "typescript": "^5.2.2",
+    "unplugin-vue-components": "^0.26.0",
+    "vite": "^5.0.11",
+    "vite-plugin-compression": "^0.5.1",
+    "vue": "^3.4.14",
+    "vue-tsc": "^1.8.25"
+  }
+}
