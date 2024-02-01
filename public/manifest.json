@@ -27,7 +27,6 @@
     }
   ],
   "action": {
-    "default_popup": "index.html",
     "default_icon": {
       "16": "/images/reimu.png",
       "32": "/images/reimu.png",

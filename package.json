@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vite --mode content",
     "build": "vue-tsc && vite build --mode dev",
-    "be": "pnpm run b:e",
+    "be": "pnpm run build:extension",
     "bw": "pnpm run build:watch",
     "build:extension": "vite build --mode popup && vue-tsc && vite build --mode content && vite build --mode background && node build.js",
     "build:watch": "vue-tsc && vite build --watch --mode popup & vite build --watch --mode content & vite build --watch --mode background & node build.js",
