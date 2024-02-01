@@ -49,6 +49,11 @@ const outDir = path.resolve(process.cwd(), env.VITE_OUTDIR)
 const contentOutDir = path.resolve(process.cwd(), env.VITE_CONTENT_OUTDIR)
 const backgroundOutDir = path.resolve(process.cwd(), env.VITE_BACKGROUND_OUTDIR)
 
+// 检查content.css有无，没有则创建，后续考虑分块
+if(!fs.existsSync(path.join(contentOutDir, 'content.css'))){
+    fs.writeFileSync(path.join(contentOutDir, 'content.css'), '', 'utf-8')
+}
+
 copyDirectory(contentOutDir, outDir)
 copyDirectory(backgroundOutDir, outDir)
 deleteDirectory(contentOutDir)
