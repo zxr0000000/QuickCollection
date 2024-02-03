@@ -1,35 +1,35 @@
-import { createApp } from 'vue'
-import App from './App.vue'
-import './index.css'
-
+import { createApp } from 'vue';
+import App from './App.vue';
+import './index.css';
 const ID = '#bootmark';
+
+// 创建挂载点并为其创建Shadow Root
+const mountPoint = document.createElement('div');
+mountPoint.id = ID.substring(1); // 移除#以获取ID
+document.body.appendChild(mountPoint);
+
+const shadowRoot = mountPoint.attachShadow({ mode: 'closed' });
+
+// 在Shadow Root内创建挂载目标
+const appMountPoint = document.createElement('div');
+shadowRoot.appendChild(appMountPoint);
+
+// 创建Vue应用并挂载到Shadow DOM中
 const app = createApp(App);
+app.mount(appMountPoint);
 
-const mount = () =>{
-    const div = document.createElement('div');
-    div.id = 'bootmark';
-    document.body.appendChild(div);
-    div.style.position = 'fixed';
-    div.style.top = '0';
-    div.style.right = '0';
-    div.style.width = '450px';
-    div.style.height = '100%';
-    div.style.zIndex = '91';
-    div.style.padding = '0';
-    div.style.margin = '0';
-    const styleElm = document.createElement('style');
-    styleElm.id = 'bootmark-right';
-    styleElm.innerHTML = `
-        html {
-            width: calc(100% - 450px) !important;
-            position: relative !important;
-            min-height: 100vh !important;
-        }
-    `;
-    document.head.appendChild(styleElm);
-    app.mount('#bootmark');
-}
+// 创建样式元素并将全局样式内容拼接进来
+const styleElm = document.createElement('style');
+styleElm.textContent = `
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+    }
+  
+`;
 
-mount();
+// 将样式元素添加到Shadow DOM中
+shadowRoot.appendChild(styleElm);
 
-console.log('hello world content todo something~');
+console.log('');
