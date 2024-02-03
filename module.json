@@ -1,0 +1,16 @@
+{
+    "popup": {
+        "html": "index.html",
+        "entry": "src/__popup/main.ts"
+    },
+    "content": {
+        "entry": "src/__content/content.ts"
+    },
+    "background": {
+        "entry": "src/__background/background.ts"
+    },
+    "option": {
+        "html": "index.html",
+        "entry": "src/__popup/main.ts"
+    }
+}

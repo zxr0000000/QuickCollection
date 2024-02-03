@@ -9,7 +9,7 @@
     "be": "pnpm run build:extension",
     "bw": "pnpm run build:watch",
     "build:extension": "vite build --mode popup && vue-tsc && vite build --mode content && vite build --mode background && node build.js",
-    "build:watch": "vue-tsc && vite build --watch --mode popup & vite build --watch --mode content & vite build --watch --mode background & node build.js",
+    "build:watch": "vue-tsc && vite build --watch --mode build_watch",
     "lint": "eslint . --ext .vue,.js,.ts,.jsx,.tsx --fix",
     "lint:script": "eslint --fix --ext .js --ext .ts --ext .vue src/",
     "lint:stylelint": "stylelint --cache --fix \"**/*.{vue,less,postcss,css,scss}\" --cache --cache-location node_modules/.cache/stylelint/",
@@ -38,6 +38,7 @@
     "vue-router": "^4.2.5"
   },
   "devDependencies": {
+    "@types/chrome": "^0.0.260",
     "@types/node": "^20.11.4",
     "@typescript-eslint/eslint-plugin": "^6.19.0",
     "@typescript-eslint/parser": "^6.19.0",
