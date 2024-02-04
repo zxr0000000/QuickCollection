@@ -1,48 +1,69 @@
 <template>
-    <div @mouseenter="handleMouseEnter" @mouseleave="handleMouseLeave" :style="computedStyle">
+    <div @mouseenter="handleMouseEnter($event, item)" @mouseleave="handleMouseLeave($event)" :style="computedStyle">
+        <span v-if="item.children && item.children.length > 0"
+            :style="{ transform: isOpen ? 'rotate(90deg)' : 'rotate(0)', display: 'inline-block', transition: 'transform 0.3s ease', marginRight: '5px' }">
+            >
+        </span>
         {{ item.title }}
-        <div v-if="isOpen" style="margin-left: 20px">
-            <tree-item v-for="(child, index) in item.children" :key="index" :item="child"></tree-item>
+        <div v-if="isOpen">
+            <tree-item v-for="(child, index) in item.children" :key="index" :item="child"
+                :level="parseInt(level) + 1"></tree-item>
         </div>
     </div>
 </template>
-  
-<script setup>
-import { ref, computed, provide, inject, defineProps } from 'vue';
 
+<script setup>
+import { ref, computed, provide, inject, defineProps, onMounted } from 'vue';
+import {useHoverStoreWithOut} from '@/store/hover'
+const hovered = useHoverStoreWithOut()
 const props = defineProps({
-    item: Object
+    item: Object,
+    level: Number
 });
-console.log('1', props.item.value)
+
+onMounted(() => {
+    console.log(props.level)
+})
 
 const isOpen = ref(false);
 const isHovered = ref(false);
 
-// 父组件提供的响应式背景色变量
 const parentHovered = inject('parentHovered', ref(false));
-
-// 向子组件提供响应式背景色变量
 provide('parentHovered', isHovered);
 
-const handleMouseEnter = () => {
-    isHovered.value = true;
-    isOpen.value = true; // 鼠标悬停自动展开
+let hoverTimer;
+
+const handleMouseEnter = (event, item) => {
+    hovered.hoverTimer = item.id
+    event.stopPropagation(); // 取消冒泡
+    clearTimeout(hoverTimer);
+    hoverTimer = setTimeout(() => {
+        isHovered.value = true;
+        isOpen.value = true;
+    }, 1000);
 };
 
-const handleMouseLeave = () => {
+const handleMouseLeave = (event) => {
+    event.stopPropagation();
+    hovered.hoverTimer = null
+    clearTimeout(hoverTimer);
     isHovered.value = false;
-    // 不立即关闭，以便有时间展开子项
 };
 
-const computedStyle = computed(() => ({
-    cursor: 'pointer',
-    fontSize: '18px',
-    color: isOpen.value || isHovered.value ? '#333' : '#666',
-    fontFamily: "'Arial', sans-serif",
-    letterSpacing: '0.05em',
-    lineHeight: '1.5',
-    padding: '10px 0',
-    backgroundColor: isHovered.value || parentHovered.value ? 'lightblue' : 'transparent'
-}));
+const computedStyle = computed(() => {
+    const isHoveredItem = hovered.hover&& props.item && hovered.hover === props.item.id;
+
+    return {
+        cursor: 'pointer',
+        fontSize: '18px',
+        color: isHoveredItem ? '#fff' : (parentHovered.value ? '#333' : '#666'),
+        fontFamily: "'Arial', sans-serif",
+        letterSpacing: '0.05em',
+        lineHeight: '1.5',
+        marginLeft: `-${(props.level - 1) * 10}px`,
+        padding: `10px 0 10px ${props.level * 10}px`,
+        backgroundColor: isHoveredItem ? '#e4e6f1' : (parentHovered.value || isHovered.value ? '#d6ebff' : 'transparent'),
+    };
+});
+
 </script>
-  

@@ -1,16 +1,24 @@
 <template>
-    <div ref="divElement" class="itemBox" style="
+    <div ref="wrapperElement" class="wrapperBox" style="
         width: 100%;
         height: 100%;
-        color: #333;
-        overflow-y: auto;
-        overflow-x: auto;
         max-height: 100%;
-        display: flex;
-        flex-direction: column; /* 列表垂直排列 */
-        padding: 20px; /* 设置左右和上下的距离 */
+        overflow: hidden;
+        userSelect:none;
       ">
-        <tree-item v-for="bookmark in bookmarks" :key="bookmark.id" :item="bookmark"></tree-item>
+        <div ref="divElement" style="
+          box-sizing: border-box;
+          width: 100%; 
+          height: 100%;
+          color: #333;
+          overflow-y: scroll;
+          overflow-x: scroll;
+          display: flex;
+          flex-direction: column;
+          padding: 40px; 
+        ">
+            <tree-item v-for="bookmark in bookmarks" :key="bookmark.id" :item="bookmark" :level="1"></tree-item>
+        </div>
     </div>
 </template>
 <script setup>
@@ -552,10 +560,53 @@ const bookmarks = [
         "title": "前端"
     },
 ];
-
 const divElement = ref();
+
+
 onMounted(async () => {
-    // 向 background script 发送消息请求添加当前页面到收藏夹
+    smoothScroll();
+    hiddenScroll();
+
+});
+
+const hiddenScroll = () => {
+    const scrollbarWidth = divElement.value.offsetWidth - divElement.value.clientWidth;
+    const scrollbarHeight = divElement.value.offsetHeight - divElement.value.clientHeight;
+    if (scrollbarWidth > 0) {
+        divElement.value.style.width = `calc(100% + ${scrollbarWidth}px)`;
+    }
+    if (scrollbarHeight > 0) {
+        divElement.value.style.height = `calc(100% + ${scrollbarWidth}px)`;
+    }
+}
+
+const  smoothScroll = () => {
+    let scrolling;
+
+    const startScroll = (direction) => {
+        const step = direction === 'down' ? 5 : -5;
+
+        const scroll = () => {
+            if ((direction === 'down' && divElement.value.scrollTop < divElement.value.scrollHeight - divElement.value.clientHeight) ||
+                (direction === 'up' && divElement.value.scrollTop > 0)) {
+                divElement.value.scrollTop += step;
+                scrolling = requestAnimationFrame(scroll);
+            } else {
+                stopScroll();
+            }
+        };
+
+        stopScroll();
+        scroll();
+    };
+
+    const stopScroll = () => {
+        if (scrolling) {
+            cancelAnimationFrame(scrolling);
+            scrolling = null;
+        }
+    };
+
     divElement.value.addEventListener('mousemove', (event) => {
         const windowHeight = divElement.value.clientHeight;
         const upperBound = windowHeight * 0.1;
@@ -564,15 +615,16 @@ onMounted(async () => {
         const mouseY = event.clientY - divElement.value.getBoundingClientRect().top;
 
         if (mouseY < upperBound) {
-            // 靠近顶部，向上滚动
-            divElement.value.scrollTop -= 10;
+            startScroll('up');
         } else if (mouseY > lowerBound) {
-            // 更新此处的条件判断
-            // 靠近底部，向下滚动
-            divElement.value.scrollTop += 10;
+            startScroll('down');
+        } else {
+            stopScroll();
         }
     });
 
-});
+    divElement.value.addEventListener('mouseleave', stopScroll);
+}
+
 </script>
   
