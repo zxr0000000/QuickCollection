@@ -17,6 +17,7 @@
           color: #fff;
           background-color: #f3f3f3;
           box-shadow: 0 0 30px 10px rgba(0, 0, 0, 0.3);
+          overflow: hidden;
         ">
             <tree-table />
         </div>

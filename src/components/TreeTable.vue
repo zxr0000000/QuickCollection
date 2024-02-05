@@ -15,9 +15,10 @@
           overflow-x: scroll;
           display: flex;
           flex-direction: column;
-          padding: 40px; 
+          padding: 20px 0 20px 0;
         ">
-            <tree-item v-for="bookmark in bookmarks" :key="bookmark.id" :item="bookmark" :level="1"
+            <tree-item 
+            v-for="bookmark in bookmarks" :key="bookmark.id" :item="bookmark" :level="1"
                 @changeHoveredItem="handleChangeHoveredItem"></tree-item>
         </div>
     </div>
@@ -31,6 +32,7 @@ const hoveredItem = ref({
     id: "",
     level: -1,
     parentId: "",
+    isDir: true
 });
 provide('hoveredItem', hoveredItem);
 
