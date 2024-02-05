@@ -4,7 +4,7 @@
         height: 100%;
         max-height: 100%;
         overflow: hidden;
-        userSelect:none;
+        user-select: none;
       ">
         <div ref="divElement" style="
           box-sizing: border-box;
@@ -17,13 +17,29 @@
           flex-direction: column;
           padding: 40px; 
         ">
-            <tree-item v-for="bookmark in bookmarks" :key="bookmark.id" :item="bookmark" :level="1"></tree-item>
+            <tree-item v-for="bookmark in bookmarks" :key="bookmark.id" :item="bookmark" :level="1"
+                @changeHoveredItem="handleChangeHoveredItem"></tree-item>
         </div>
     </div>
 </template>
+
 <script setup>
 import TreeItem from './TreeItem.vue';
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, provide } from 'vue';
+
+const hoveredItem = ref({
+    id: "",
+    level: -1,
+    parentId: "",
+});
+provide('hoveredItem', hoveredItem);
+
+const handleChangeHoveredItem = (newItem) => {
+    hoveredItem.value = newItem;
+};
+
+
+const divElement = ref();
 const bookmarks = [
     {
         "children": [
@@ -560,14 +576,13 @@ const bookmarks = [
         "title": "前端"
     },
 ];
-const divElement = ref();
-
 
 onMounted(async () => {
     smoothScroll();
     hiddenScroll();
-
 });
+
+
 
 const hiddenScroll = () => {
     const scrollbarWidth = divElement.value.offsetWidth - divElement.value.clientWidth;
@@ -580,7 +595,7 @@ const hiddenScroll = () => {
     }
 }
 
-const  smoothScroll = () => {
+const smoothScroll = () => {
     let scrolling;
 
     const startScroll = (direction) => {
