@@ -1,7 +1,7 @@
 {
     "popup": {
-        "html": "index.html",
-        "entry": "src/__popup/main.ts"
+        "html": "template/popup.html",
+        "entry": "src/__popup/popup.ts"
     },
     "content": {
         "entry": "src/__content/content.ts"
@@ -10,7 +10,10 @@
         "entry": "src/__background/background.ts"
     },
     "option": {
-        "html": "index.html",
-        "entry": "src/__popup/main.ts"
+        "html": "template/option.html",
+        "entry": "src/__option/option.ts"
+    },
+    "content_main_script": {
+        "entry": "src/__content/main.ts"
     }
 }

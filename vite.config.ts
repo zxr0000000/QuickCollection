@@ -1,44 +1,53 @@
-import { defineConfig } from 'vite';
+import { defineConfig, loadEnv, type UserConfig } from 'vite';
+
 import vue from '@vitejs/plugin-vue';
-import Components from 'unplugin-vue-components/vite';
-import autoImport from 'unplugin-vue-components/vite';
 import compression from 'vite-plugin-compression';
 import path from 'path';
-// https://vitejs.dev/config/
 
-import getExtensionConfig from './config'
+const moduleInfo = require('./module.json');
 
-export default defineConfig(({ mode, }) => {
-  const extensionConfig = getExtensionConfig(mode);
+const mutiEntry = (info: any) => {
+  const inputModule = {};
+  const moduleEntry = [];
+  for (const key in info) {
+    inputModule[key] = path.resolve(__dirname, info[key].html || info[key].entry);
+    moduleEntry.push(info[key].entry);
+  }
+  return { inputModule, moduleEntry };
+};
+
+export default defineConfig(({ mode }): UserConfig => {
+  const env = loadEnv(mode, process.cwd());
+  const { inputModule } = mutiEntry(moduleInfo);
 
   return {
     plugins: [
       vue(),
-      Components({
-        dts: path.resolve(__dirname, 'types/components.d.ts')
-      }),
-      autoImport({
-        dts: path.resolve(__dirname, 'types/auto-import.d.ts')
-      }),
       compression({
-        threshold: 1024 * 500, // 500kb才会被压缩
+        threshold: 1024 * 500, // 1MB才会被压缩
         ext: '.gz',
         deleteOriginFile: false
       })
     ],
-    server: {
-      host: 'localhost',
-      port: 3000,
-      hmr: true,
-      open: false,
-    },
     resolve: {
       alias: {
         '@': path.join(__dirname, './src'),
-        '@Project': path.join(__dirname, './src/Project')
+        '@bg': path.join(__dirname, './src/__background'),
+        '@ct': path.join(__dirname, './src/__content'),
+        '@pp': path.join(__dirname, './src/__popup')
       }
     },
     envPrefix: 'VITE_',
-    ...extensionConfig
-  }
+    build: {
+      outDir: env.VITE_OUTDIR,
+      rollupOptions: {
+        input: inputModule,
+        output: {
+          chunkFileNames: 'assets/[name].[hash].js',
+          assetFileNames: '[ext]/[name].[ext]',
+          entryFileNames: '[name].js'
+        }
+      }
+    }
+  };
 });
