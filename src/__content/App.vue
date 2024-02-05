@@ -1,32 +1,59 @@
 <template>
-  <div v-if="show">
-    <mainPage />
-  </div>
+  <mainPage v-if="show" />
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted, onUnmounted } from 'vue';
 import mainPage from '@/__content/views/mainPage.vue';
 
 const show = ref(false);
-console.log('进入');
 
-let timeoutId = null;
+let isMoved = false;
+let timeoutId;
 
-// 监听键盘按下事件
-document.addEventListener('mousedown', function (event) {
+const onMouseMove = () => {
+  isMoved = true;
+  clearTimeout(timeoutId);
+  document.removeEventListener('mousemove', onMouseMove);
+};
+
+const onMouseDown = (event) => {
   if (event.button === 0) {
+    isMoved = false;
     timeoutId = setTimeout(function () {
-      show.value = !show.value;
-      clearTimeout(timeoutId);
+      if (!isMoved) {
+        show.value = true;
+      }
+      document.removeEventListener('mousemove', onMouseMove);
     }, 1500);
-  }
-});
 
-// 监听右键鼠标释放事件
-document.addEventListener('mouseup', function (event) {
+    document.addEventListener('mousemove', onMouseMove);
+  }
+};
+
+const onMouseUp = (event) => {
   if (event.button === 0) {
     clearTimeout(timeoutId);
+    document.removeEventListener('mousemove', onMouseMove);
   }
+};
+
+const onMessage = (request) => {
+  if (request.action === 'close') {
+    show.value = false;
+  }
+  return true;
+};
+
+onMounted(() => {
+  document.addEventListener('mousedown', onMouseDown);
+  document.addEventListener('mouseup', onMouseUp);
+  window.chrome.runtime.onMessage.addListener(onMessage);
+});
+
+onUnmounted(() => {
+  document.removeEventListener('mousedown', onMouseDown);
+  document.removeEventListener('mouseup', onMouseUp);
+  window.chrome.runtime.onMessage.removeListener(onMessage);
 });
 </script>

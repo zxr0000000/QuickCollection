@@ -4,17 +4,18 @@
   "description": "基于Vite的chrome插件V3 Template",
   "manifest_version": 3,
   "background": {
-    "service_worker": "background.js"
+    "service_worker": "background.js",
+    "type": "module"
   },
   "content_scripts": [
     {
       "matches": ["<all_urls>"],
-      "css": ["content.css"],
+      "css": ["css/content_main_script.css"],
       "js": ["content.js"],
       "run_at": "document_end"
     }
   ],
-  "permissions": ["storage","declarativeContent","bookmarks"],
+  "permissions": ["storage","declarativeContent","bookmarks", "tabs"],
   "host_permissions":[],
   "web_accessible_resources": [
     {
@@ -22,8 +23,12 @@
       "matches": ["<all_urls>"]
     },
     {
-      "resources": [ "insert.js" ],
-      "matches": ["<all_urls>"]
+      "matches": ["<all_urls>"],
+      "resources": [ "content_main_script.js" ]
+    },
+    {
+      "matches": ["<all_urls>"],
+      "resources": ["assets/*"]
     }
   ],
   "action": {

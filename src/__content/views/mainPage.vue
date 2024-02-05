@@ -17,19 +17,20 @@
         align-items: center;
         font-size: 60px;
         letter-spacing: 0.5em;
-        backdrop-filter: blur(20px);
         color: #fff;
+        background-color: #f3f3f3;
         box-shadow: 0 0 30px 10px rgba(0, 0, 0, 0.3);
+        overflow: hidden;
       "
     >
-      <folderTable />
+      <tree-table />
     </div>
   </div>
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue';
-import folderTable from '@/__content/components/Table.vue';
+import TreeTable from '@/__content/components/TreeTable.vue';
 
 const pageWidth = ref();
 const pageHeight = ref();
@@ -37,16 +38,10 @@ const pageHeight = ref();
 const updatePageDimensions = () => {
   pageWidth.value = window.innerWidth;
   pageHeight.value = window.innerHeight;
-  console.log(pageWidth, pageHeight);
 };
 
 onMounted(async () => {
-  const pageTitle = document.title;
-  const pageUrl = window.location.href;
-
-  // 监听窗口大小变化
   window.addEventListener('resize', updatePageDimensions);
-
   pageWidth.value = window.innerWidth;
   pageHeight.value = window.innerHeight;
 });
