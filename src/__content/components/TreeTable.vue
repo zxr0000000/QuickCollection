@@ -1,12 +1,7 @@
 <template>
-  <div
-    ref="wrapperElement"
-    class="wrapperBox"
-    style="width: 100%; height: 100%; max-height: 100%; overflow: hidden; user-select: none"
-  >
-    <div
-      ref="divElement"
-      style="
+  <div ref="wrapperElement" class="wrapperBox"
+    style="width: 100%; height: 100%; max-height: 100%; overflow: hidden; user-select: none">
+    <div ref="divElement" style="
         box-sizing: border-box;
         width: 100%;
         height: 100%;
@@ -16,15 +11,9 @@
         display: flex;
         flex-direction: column;
         padding: 20px 0 20px 0;
-      "
-    >
-      <tree-item
-        v-for="bookmark in bookmarks"
-        :key="bookmark.id"
-        :item="bookmark"
-        :level="1"
-        @changeHoveredItem="handleChangeHoveredItem"
-      ></tree-item>
+      ">
+      <tree-item v-for="bookmark in bookmarks" :key="bookmark.id" :item="bookmark" :level="1"
+        @changeHoveredItem="handleChangeHoveredItem"></tree-item>
     </div>
   </div>
 </template>
@@ -61,11 +50,14 @@ const bookmarks = ref([
 
 const mouseUpHandler = (event) => {
   if (event.button === 0) {
-    window.chrome.runtime.sendMessage({
-      action: 'insertItem',
-      hoveredInfo: getHoverItemInfo(),
-      insertItem: getInsertItem()
-    });
+    // 这里的延迟是为了防止用户一触发 open 事件，就插入书签，此时可能 hoverItem 还没有及时更新
+    setTimeout(() => {
+      window.chrome.runtime.sendMessage({
+        action: 'insertItem',
+        hoveredInfo: getHoverItemInfo(),
+        insertItem: getInsertItem()
+      });
+    }, 50);
   }
 };
 

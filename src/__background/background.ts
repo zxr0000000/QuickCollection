@@ -12,33 +12,31 @@ interface BookmarkNode {
 let bookmarks = [] as BookmarkNode[];
 
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
+  console.log(`触发 ${request.action} 事件`);
+
   if (request.action === 'getBookmarks') {
     chrome.bookmarks.getTree(function (bookmarkTreeNodes) {
       bookmarks = bookmarkTreeNodes[0].children?.[0].children || [];
-      sendResponse(bookmarkTreeNodes[0].children?.[0].children);
+      console.log('书签:', bookmarks);
+      sendResponse(bookmarks);
     });
     return true;
   }
 
   if (request.action === 'insertItem') {
-    console.log('监听到插入');
     const insertItem = request.insertItem;
     const hoveredInfo = request.hoveredInfo;
     const hoverItem = findBookmarkById(bookmarks, hoveredInfo.id);
-
-    console.log(insertItem, hoveredInfo);
+    console.log(insertItem, hoveredInfo, hoverItem);
     if (hoverItem == null) {
       console.log('没有找到' + hoveredInfo.id + '对应的节点');
-      chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-        if (tabs[0].id) {
-          chrome.tabs.sendMessage(tabs[0].id, { action: 'close' });
-        }
-      });
+      sendResponse({ error: true, message: 'Bookmark node not found' });
+      closeTab();
       return true;
     }
 
     let parentId = hoverItem.parentId;
-    let index = (hoverItem.index || 0) + 1;
+    let index = hoverItem.index != null ? hoverItem.index + 1 : 0;
     if (hoveredInfo.isOpen) {
       parentId = hoverItem.id;
       index = 0;
@@ -53,18 +51,22 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
       },
       function (newBookmark) {
         console.log('添加的书签: ', newBookmark);
-
-        chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-          if (tabs[0].id) {
-            chrome.tabs.sendMessage(tabs[0].id, { action: 'close' });
-          }
-        });
-
-        return true;
+        sendResponse({ success: true, newBookmark: newBookmark });
+        closeTab();
       }
     );
+
+    return true;
   }
 });
+
+const closeTab = () => {
+  chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+    if (tabs[0] && tabs[0].id) {
+      chrome.tabs.sendMessage(tabs[0].id, { action: 'close' });
+    }
+  });
+};
 
 const findBookmarkById = (nodes: BookmarkNode[], id: string): BookmarkNode | null => {
   for (const node of nodes) {
