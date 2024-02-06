@@ -2,7 +2,7 @@
   <div class="userContainer">
     <h2>通用设置</h2>
     <div class="item">
-      <h3>定时提醒</h3>
+      <h3 @click="test">定时提醒</h3>
       <div class="content">
         <p>设置需要定时提醒的收藏夹以及提醒的时间</p>
       </div>
@@ -14,7 +14,11 @@
 import { onMounted } from 'vue';
 import { useBookmarksStore } from '@/store';
 const bookmarksStore = useBookmarksStore();
-
+const test = () => {
+  window.chrome.runtime.sendMessage({
+    action: 'sendNotification'
+  });
+};
 onMounted(async () => {
   await bookmarksStore.fetchBookmarks();
   console.log(bookmarksStore.getBookmarks);

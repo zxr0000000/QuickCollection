@@ -58,6 +58,25 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
 
     return true;
   }
+
+  if (request.action === 'sendNotification') {
+    // 定义通知选项
+    const options: chrome.notifications.NotificationOptions = {
+      type: 'basic',
+      iconUrl: 'https://pic1.zhuanstatic.com/zhuanzh/50b6ffe4-c7e3-4317-bc59-b2ec4931f325.png', // 请确保你有一个适当的图标文件在你的扩展中
+      title: '通知标题',
+      message: '这是一个通知的内容。'
+    };
+
+    // 创建通知
+    chrome.notifications.create('', options, (notificationId) => {
+      // 通知创建后的回调（如果需要）
+      console.log(`Notification created with ID: ${notificationId}`);
+    });
+
+    // 可选：向前端发送响应
+    sendResponse({ status: 'Notification sent' });
+  }
 });
 
 const closeTab = () => {
