@@ -1,7 +1,12 @@
 <template>
-  <div ref="wrapperElement" class="wrapperBox"
-    style="width: 100%; height: 100%; max-height: 100%; overflow: hidden; user-select: none">
-    <div ref="divElement" style="
+  <div
+    ref="wrapperElement"
+    class="wrapperBox"
+    style="width: 100%; height: 100%; max-height: 100%; overflow: hidden; user-select: none"
+  >
+    <div
+      ref="divElement"
+      style="
         box-sizing: border-box;
         width: 100%;
         height: 100%;
@@ -11,9 +16,15 @@
         display: flex;
         flex-direction: column;
         padding: 20px 0 20px 0;
-      ">
-      <tree-item v-for="bookmark in bookmarks" :key="bookmark.id" :item="bookmark" :level="1"
-        @changeHoveredItem="handleChangeHoveredItem"></tree-item>
+      "
+    >
+      <tree-item
+        v-for="bookmark in bookmarks"
+        :key="bookmark.id"
+        :item="bookmark"
+        :level="1"
+        @changeHoveredItem="handleChangeHoveredItem"
+      ></tree-item>
     </div>
   </div>
 </template>

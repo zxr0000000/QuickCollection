@@ -15,6 +15,7 @@
       "run_at": "document_end"
     }
   ],
+  "options_page": "/template/option.html",
   "permissions": ["storage","declarativeContent","bookmarks", "tabs"],
   "host_permissions":[],
   "web_accessible_resources": [
