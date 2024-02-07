@@ -66,7 +66,7 @@ const handleMouseEnter = (event) => {
       isDir: props.item?.children ? true : false,
       isOpen
     });
-  }, 1000);
+  }, 500);
 };
 
 const handleMouseLeave = (event) => {

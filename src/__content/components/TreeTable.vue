@@ -59,7 +59,7 @@ const bookmarks = ref([
   }
 ]);
 
-const mouseUpHandler = (event) => {
+const mouseDownHandler = (event) => {
   if (event.button === 0) {
     // 这里的延迟是为了防止用户一触发 open 事件，就插入书签，此时可能 hoverItem 还没有及时更新
     setTimeout(() => {
@@ -75,7 +75,7 @@ const mouseUpHandler = (event) => {
 const divElement = ref();
 
 onMounted(() => {
-  document.addEventListener('mouseup', mouseUpHandler);
+  document.addEventListener('mousedown', mouseDownHandler);
 
   window.chrome.runtime
     .sendMessage({
@@ -90,7 +90,7 @@ onMounted(() => {
 });
 
 onUnmounted(() => {
-  document.removeEventListener('mouseup', mouseUpHandler);
+  document.removeEventListener('mouseup', mouseDownHandler);
 });
 
 const getInsertItem = () => {
