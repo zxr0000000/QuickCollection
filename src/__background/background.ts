@@ -61,9 +61,9 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
 
   if (request.action === 'sendNotification') {
     // 定义通知选项
-    const options: chrome.notifications.NotificationOptions = {
+    const options: chrome.notifications.NotificationOptions<true> = {
       type: 'basic',
-      iconUrl: 'https://pic1.zhuanstatic.com/zhuanzh/50b6ffe4-c7e3-4317-bc59-b2ec4931f325.png', // 请确保你有一个适当的图标文件在你的扩展中
+      iconUrl: 'images/reimu.png',
       title: '通知标题',
       message: '这是一个通知的内容。'
     };

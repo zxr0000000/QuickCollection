@@ -6,6 +6,13 @@
       <div class="content">
         <p>设置需要定时提醒的收藏夹以及提醒的时间</p>
       </div>
+      <h3>代看列表</h3>
+      <div class="content">
+        <el-table :data="bookmarks">
+          <el-table-column prop="name" width="120" label="Name" />
+          <el-table-column prop="date" width="150" label="Date" />
+        </el-table>
+      </div>
     </div>
   </div>
 </template>
