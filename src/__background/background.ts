@@ -9,63 +9,72 @@ interface BookmarkNode {
   dateGroupModified?: number;
 }
 
-import { EVERYDAY_AlARM_NAME } from '@/const';
-
-let bookmarks = [] as BookmarkNode[];
+import { PRODUCT_NAME, EVERYDAY_AlARM_NAME } from '@/const';
 
 // 监听 content.js 发送的事件
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   console.log(`触发 ${request.action} 事件`);
 
   if (request.action === 'getBookmarks') {
-    chrome.bookmarks.getTree(function (bookmarkTreeNodes) {
-      bookmarks = bookmarkTreeNodes[0].children?.[0].children || [];
-      console.log('书签:', bookmarks);
-      sendResponse(bookmarks);
-    });
+    getBookmarks()
+      .then((bookmarks) => {
+        console.log('书签:', bookmarks);
+        sendResponse(bookmarks);
+      })
+      .catch((error) => {
+        console.error('Error getting bookmarks:', error);
+        sendResponse({ error: error.toString() });
+      });
+
     return true;
   }
 
   if (request.action === 'insertItem') {
     const insertItem = request.insertItem;
     const hoveredInfo = request.hoveredInfo;
-    const hoverItem = findBookmarkById(bookmarks, hoveredInfo.id);
-    console.log(insertItem, hoveredInfo, hoverItem);
-    if (hoverItem == null) {
-      console.log('没有找到' + hoveredInfo.id + '对应的节点');
-      sendResponse({ error: true, message: 'Bookmark node not found' });
-      closeTab();
-      return true;
-    }
-
-    let parentId = hoverItem.parentId;
-    let index = hoverItem.index != null ? hoverItem.index + 1 : 0;
-    if (hoveredInfo.isOpen) {
-      parentId = hoverItem.id;
-      index = 0;
-    }
-
-    chrome.bookmarks.create(
-      {
-        parentId,
-        index,
-        title: insertItem.title,
-        url: insertItem.url
-      },
-      function (newBookmark) {
-        console.log('添加的书签: ', newBookmark);
-        sendResponse({ success: true, newBookmark: newBookmark });
+    getBookmarks().then((bookmarks) => {
+      const hoverItem = findBookmarkById(bookmarks, hoveredInfo.id);
+      console.log(insertItem, hoveredInfo, hoverItem);
+      if (hoverItem == null) {
+        console.log('没有找到' + hoveredInfo.id + '对应的节点');
+        sendResponse({ error: true, message: 'Bookmark node not found' });
         closeTab();
+        return true;
       }
-    );
+
+      let parentId = hoverItem.parentId;
+      let index = hoverItem.index != null ? hoverItem.index + 1 : 0;
+      if (hoveredInfo.isOpen) {
+        parentId = hoverItem.id;
+        index = 0;
+      }
+
+      chrome.bookmarks.create(
+        {
+          parentId,
+          index,
+          title: insertItem.title,
+          url: insertItem.url
+        },
+        function (newBookmark) {
+          console.log('添加的书签: ', newBookmark);
+          sendResponse({ success: true, newBookmark: newBookmark });
+          closeTab();
+        }
+      );
+    });
 
     return true;
   }
 
   if (request.action === 'sendNotification') {
     // 定义通知选项
-
     // 可选：向前端发送响应
+    sendNotification({
+      iconUrl: 'images/reimu.png',
+      title: '每日待看提醒',
+      message: 'xxx 文件夹下面还有 文件'
+    });
     sendResponse({ status: 'Notification sent' });
   }
 
@@ -90,26 +99,50 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
 chrome.alarms.onAlarm.addListener((alarm) => {
   console.log(`${alarm.name}  闹钟触发`);
   if (alarm.name === EVERYDAY_AlARM_NAME) {
-    sendNotification({
-      iconUrl: 'images/reimu.png',
-      title: '每日待看提醒',
-      message: 'xxx 文件夹下面还有 文件'
-    });
+    reduceEveryDayAlarmName();
   }
 });
 
-const reduceEveryDayAlarmName = async () => {
-  const result = await new Promise((resolve, reject) => {
-    window.chrome.storage.local.get(`${EVERYDAY_AlARM_NAME}everyDayInfo`, (result) => {
-      if (window.chrome.runtime.lastError) {
-        reject(window.chrome.runtime.lastError);
-      } else {
-        resolve(result.everyDayInfo);
-      }
+const getBookmarks = (): Promise<BookmarkNode[]> => {
+  return new Promise((resolve) => {
+    chrome.bookmarks.getTree(function (bookmarkTreeNodes) {
+      const bookmarks = bookmarkTreeNodes[0].children?.[0].children || [];
+      resolve(bookmarks);
     });
   });
+};
+
+const reduceEveryDayAlarmName = async () => {
+  console.log('进入');
+  let result;
+  try {
+    result = (await new Promise((resolve, reject) => {
+      chrome.storage.local.get(`${PRODUCT_NAME}everyDayInfo`, (result) => {
+        if (chrome.runtime.lastError) {
+          reject(chrome.runtime.lastError);
+        } else {
+          resolve(result[`${PRODUCT_NAME}everyDayInfo`] as { folderId: string });
+        }
+      });
+    })) as { folderId: string };
+  } catch (error) {
+    console.error(error);
+    return;
+  }
   console.log(result);
-  const alarmItem = findBookmarkById(result.folderId);
+  if (!result || !result.folderId) {
+    console.log('folderId不可用。');
+    return;
+  }
+
+  const bookmarks = await getBookmarks();
+  const alarmItem = findBookmarkById(bookmarks, result.folderId);
+  const awaitWatchFilesNum = alarmItem?.children?.length;
+  sendNotification({
+    iconUrl: 'images/reimu.png',
+    title: '每日待看提醒',
+    message: `${alarmItem?.title} 文件夹下面还有${awaitWatchFilesNum}文件`
+  });
 };
 
 const closeTab = () => {

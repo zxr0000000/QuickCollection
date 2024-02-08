@@ -6,12 +6,7 @@
       <div class="content">
         <p>设置需要定时提醒的收藏夹以及提醒的时间</p>
         <el-time-select v-model="alarmTime" start="08:30" step="00:15" end="18:30" placeholder="选择每天提醒的时间" />
-        <el-cascader
-          v-model="selectFolder"
-          :options="folderList"
-          :show-all-levels="false"
-          placeholder="选择需要提醒的文件夹"
-        />
+        <el-cascader v-model="selectFolder" :options="folderList" :show-all-levels="false" placeholder="选择需要提醒的文件夹" />
         <div style="display: flex; flex-direction: row">
           <el-button type="primary" @click="clearEveryDayAlarm">清空</el-button>
           <el-button type="success" @click="saveEveryDayAlarm" :disabled="!isAbleEveryDayAlarmInfoSave">保存</el-button>
@@ -46,12 +41,6 @@ const selectFolder = ref('');
 const isAbleEveryDayAlarmInfoSave = ref(false);
 let bookmarks = [];
 const folderList = ref([]);
-
-onMounted(async () => {
-  const everyDayInfo = await userStore.getEveryDayInfo();
-  alarmTime.value = everyDayInfo.time;
-  selectFolder.value = everyDayInfo.folderId;
-});
 
 watch([alarmTime, selectFolder], ([newAlarmTime, newSelectFolder]) => {
   if (newAlarmTime !== '' && newSelectFolder !== '') {
@@ -104,7 +93,6 @@ const test = () => {
 
 onMounted(async () => {
   bookmarks = await bookmarksStore.getBookmarks();
-  console.log(bookmarks);
   folderList.value = bookmarks
     .map((item) => {
       if (!item.children) return false;
@@ -115,7 +103,9 @@ onMounted(async () => {
     })
     .filter((item) => item !== false);
 
-  console.log(folderList.value);
+  const everyDayInfo = await userStore.getEveryDayInfo();
+  alarmTime.value = everyDayInfo.time;
+  selectFolder.value = everyDayInfo.folderId;
 });
 
 const setSuccessMessage = (message) => {

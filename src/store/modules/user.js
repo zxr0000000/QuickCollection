@@ -60,9 +60,9 @@ export const useUserStore = defineStore('user', () => {
           () => {
             if (window.chrome.runtime.lastError) {
               innerReject(window.chrome.runtime.lastError);
-              console.log(user.value.everyDayInfo + '保存失败');
+              console.log(`${user.value.everyDayInfo} 保存失败`);
             } else {
-              console.log(user.value.everyDayInfo + '保存成功');
+              console.log(user.value.everyDayInfo, '保存成功');
               innerResolve();
             }
           }
@@ -75,7 +75,7 @@ export const useUserStore = defineStore('user', () => {
             action: 'addAlarm',
             alarmInfo: {
               alarmName: EVERYDAY_AlARM_NAME,
-              time: '1:55',
+              time: '17:58',
               periodInMinutes: 1
             }
           },
@@ -124,14 +124,15 @@ export const useUserStore = defineStore('user', () => {
 
   const getEveryDayInfo = async () => {
     const result = await new Promise((resolve, reject) => {
-      window.chrome.storage.local.get(`${EVERYDAY_AlARM_NAME}everyDayInfo`, (result) => {
+      window.chrome.storage.local.get(`${PRODUCT_NAME}everyDayInfo`, (result) => {
         if (window.chrome.runtime.lastError) {
           reject(window.chrome.runtime.lastError);
         } else {
-          resolve(result.everyDayInfo);
+          resolve(result[`${PRODUCT_NAME}everyDayInfo`]);
         }
       });
     });
+
     user.value.everyDayInfo = result;
     return result;
   };
