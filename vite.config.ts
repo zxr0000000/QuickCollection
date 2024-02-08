@@ -3,8 +3,10 @@ import { defineConfig, loadEnv, type UserConfig } from 'vite';
 import vue from '@vitejs/plugin-vue';
 import compression from 'vite-plugin-compression';
 import path from 'path';
+import { WebSocketServer, WebSocket } from 'ws';
 
 const moduleInfo = require('./module.json');
+const SOCKET_PORT = 8998;
 
 const mutiEntry = (info: any) => {
   const inputModule = {};
@@ -15,6 +17,27 @@ const mutiEntry = (info: any) => {
   }
   return { inputModule, moduleEntry };
 };
+
+function refresh() {
+  let socket: WebSocket;
+  return {
+    name: 'extension-refresh',
+    configResolved() {
+      const wss = new WebSocketServer({ port: SOCKET_PORT });
+      wss.on('connection', function connection(ws) {
+        console.log('[webSocket] Client connected.');
+        ws.on('close', () => console.log('[webSocket] Client disconnected.'));
+        socket = ws;
+      });
+    },
+
+    writeBundle() {
+      if (socket) {
+        socket.send('HMR_UPDATE');
+      }
+    }
+  };
+}
 
 export default defineConfig(({ mode }): UserConfig => {
   const env = loadEnv(mode, process.cwd());
@@ -27,8 +50,12 @@ export default defineConfig(({ mode }): UserConfig => {
         threshold: 1024 * 500, // 1MB才会被压缩
         ext: '.gz',
         deleteOriginFile: false
-      })
+      }),
+      refresh()
     ],
+    define: {
+      SOCKET_PORT: JSON.stringify(SOCKET_PORT)
+    },
     resolve: {
       alias: {
         '@': path.join(__dirname, './src'),
@@ -38,8 +65,10 @@ export default defineConfig(({ mode }): UserConfig => {
       }
     },
     envPrefix: 'VITE_',
+    server: {},
     build: {
       outDir: env.VITE_OUTDIR,
+      emptyOutDir: true,
       rollupOptions: {
         input: inputModule,
         output: {
