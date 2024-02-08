@@ -82,3 +82,19 @@ const findBookmarkById = (nodes: BookmarkNode[], id: string): BookmarkNode | nul
   }
   return null;
 };
+
+const ws = new WebSocket(`ws://localhost:${SOCKET_PORT}`);
+console.log('websocket');
+ws.onopen = function () {
+  console.log('[webSocket] Connection established');
+};
+ws.onmessage = function (e) {
+  console.log('Received Message: ' + e.data);
+  if (e.data === 'HMR_UPDATE') {
+    chrome.runtime.sendMessage({ action: 'RELOAD' });
+    chrome.tabs.reload();
+  }
+};
+ws.onclose = function () {
+  console.log('[webSocket] Connection closed.');
+};

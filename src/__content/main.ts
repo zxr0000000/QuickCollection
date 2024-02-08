@@ -31,5 +31,3 @@ styleElm.textContent = `
 
 // 将样式元素添加到Shadow DOM中
 shadowRoot.appendChild(styleElm);
-
-console.log('');

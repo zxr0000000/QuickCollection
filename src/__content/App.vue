@@ -25,7 +25,7 @@ const onMouseDown = (event) => {
         show.value = true;
       }
       document.removeEventListener('mousemove', onMouseMove);
-    }, 1500);
+    }, 800);
 
     document.addEventListener('mousemove', onMouseMove);
   }
