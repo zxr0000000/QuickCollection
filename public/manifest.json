@@ -16,16 +16,16 @@
     }
   ],
   "options_page": "/template/option.html",
-  "permissions": ["storage","declarativeContent","bookmarks", "tabs"],
-  "host_permissions":[],
+  "permissions": ["storage", "declarativeContent", "bookmarks", "tabs"],
+  "host_permissions": [],
   "web_accessible_resources": [
     {
-      "resources": [ "/images/reimu.png" ],
+      "resources": ["/images/reimu.png"],
       "matches": ["<all_urls>"]
     },
     {
       "matches": ["<all_urls>"],
-      "resources": [ "content_main_script.js" ]
+      "resources": ["content_main_script.js", "css/content_main_script.css"]
     },
     {
       "matches": ["<all_urls>"],

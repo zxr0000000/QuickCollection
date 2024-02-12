@@ -19,15 +19,10 @@ const app = createApp(App);
 app.mount(appMountPoint);
 
 // 创建样式元素并将全局样式内容拼接进来
-const styleElm = document.createElement('style');
-styleElm.textContent = `
-    * {
-        box-sizing: border-box;
-        margin: 0;
-        padding: 0;
-    }
-  
-`;
 
+const styleEl = document.createElement('link')
+styleEl.setAttribute('rel', 'stylesheet')
+styleEl.setAttribute('href', chrome.runtime.getURL('css/content_main_script.css'))
 // 将样式元素添加到Shadow DOM中
-shadowRoot.appendChild(styleElm);
+shadowRoot.appendChild(styleEl);
+

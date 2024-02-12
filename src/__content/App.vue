@@ -3,6 +3,7 @@
 </template>
 
 <script setup>
+import 'uno.css'
 import { ref, onMounted, onUnmounted } from 'vue';
 import mainPage from '@/__content/views/mainPage.vue';
 import { hotkeyManager } from './common/hotkey/HotkeyManager';
