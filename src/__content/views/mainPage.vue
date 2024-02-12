@@ -11,7 +11,7 @@
         color: 'black';
         width: 80%;
         height: 50%;
-        border-radius: 4px;
+        border-radius: 40px;
         display: flex;
         justify-content: center;
         align-items: center;
