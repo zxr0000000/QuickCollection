@@ -57,6 +57,9 @@ const handleMouseEnter = (event) => {
     isOpen
   });
   event.stopPropagation();
+  if (!props.item?.children) {
+    return;
+  }
   hoverTimer = setTimeout(() => {
     isOpen.value = true;
     emit('changeHoveredItem', {

@@ -35,21 +35,6 @@ export const useUserStore = defineStore('user', () => {
     });
   };
 
-  const setAwaitWatchList = (newAwaitWatchList) => {
-    return new Promise((resolve, reject) => {
-      user.value.awaitWatchList = newAwaitWatchList;
-      user.value
-        .saveAwaitWatchList()
-        .then(() => {
-          resolve(newAwaitWatchList);
-        })
-        .catch((error) => {
-          console.log(error);
-          reject('fail');
-        });
-    });
-  };
-
   const saveEveryDayInfo = async () => {
     return new Promise((resolve, reject) => {
       const saveDataPromise = new Promise((innerResolve, innerReject) => {
@@ -70,13 +55,19 @@ export const useUserStore = defineStore('user', () => {
       });
 
       const sendMessagePromise = new Promise((innerResolve, innerReject) => {
+        const now = new Date();
+
+        const [hours, minutes] = user.value.everyDayInfo.time.split(':').map(Number);
+        const target = new Date(now.getFullYear(), now.getMonth(), now.getDate(), hours, minutes);
+        console.log(target);
+        //TODO: 设置每日闹钟响应的间隔时间
         window.chrome.runtime.sendMessage(
           {
             action: 'addAlarm',
             alarmInfo: {
               alarmName: EVERYDAY_AlARM_NAME,
-              time: '17:58',
-              periodInMinutes: 1
+              targetTime: target,
+              periodInMinutes: 24 * 60
             }
           },
           function (response) {
@@ -100,35 +91,14 @@ export const useUserStore = defineStore('user', () => {
     });
   };
 
-  const saveAwaitWatchList = async () => {
-    try {
-      await new Promise((resolve, reject) => {
-        window.chrome.storage.local.set(
-          {
-            [`${PRODUCT_NAME}awaitWatchList`]: user.value.awaitWatchList
-          },
-          () => {
-            if (window.chrome.runtime.lastError) {
-              reject(window.chrome.runtime.lastError);
-            } else {
-              resolve();
-            }
-          }
-        );
-      });
-      console.log('awaitWatchList saved successfully');
-    } catch (error) {
-      console.error('Failed to save awaitWatchList to chrome.storage:', error);
-    }
-  };
-
   const getEveryDayInfo = async () => {
     const result = await new Promise((resolve, reject) => {
       window.chrome.storage.local.get(`${PRODUCT_NAME}everyDayInfo`, (result) => {
         if (window.chrome.runtime.lastError) {
           reject(window.chrome.runtime.lastError);
         } else {
-          resolve(result[`${PRODUCT_NAME}everyDayInfo`]);
+          console.log(`获取成功`, result[`${PRODUCT_NAME}everyDayInfo`] || {});
+          resolve(result[`${PRODUCT_NAME}everyDayInfo`] || {});
         }
       });
     });
@@ -139,11 +109,11 @@ export const useUserStore = defineStore('user', () => {
 
   const getAwaitWatchList = async () => {
     const result = await new Promise((resolve, reject) => {
-      window.chrome.storage.local.get(`${EVERYDAY_AlARM_NAME}awaitWatchList`, (result) => {
+      window.chrome.storage.local.get(`${PRODUCT_NAME}awaitWatchList`, (result) => {
         if (window.chrome.runtime.lastError) {
           reject(window.chrome.runtime.lastError);
         } else {
-          resolve(result.awaitWatchList);
+          resolve(result[`${PRODUCT_NAME}awaitWatchList`]);
         }
       });
     });
@@ -152,20 +122,37 @@ export const useUserStore = defineStore('user', () => {
   };
 
   const clearEveryDayInfo = async () => {
-    try {
-      await new Promise((resolve, reject) => {
+    return new Promise((resolve, reject) => {
+      const removePromise = new Promise((resolveRemove) => {
         window.chrome.storage.local.remove(`${PRODUCT_NAME}everyDayInfo`, () => {
           if (window.chrome.runtime.lastError) {
             reject(window.chrome.runtime.lastError);
           } else {
-            resolve();
+            console.log('本地删除成功');
+            resolveRemove();
           }
         });
       });
-      console.log('everyDayInfo cleared successfully');
-    } catch (error) {
-      console.error('Failed to clear everyDayInfo from chrome.storage:', error);
-    }
+
+      const sendMessagePromise = new Promise((resolveMessage) => {
+        window.chrome.runtime.sendMessage({ action: 'clearAlarm', clearAlarmName: EVERYDAY_AlARM_NAME }, (response) => {
+          if (response) {
+            console.log('远程清空成功');
+            resolveMessage();
+          } else {
+            reject(new Error('Failed to clear alarm'));
+          }
+        });
+      });
+
+      Promise.all([removePromise, sendMessagePromise])
+        .then(() => {
+          resolve();
+        })
+        .catch((error) => {
+          reject(error);
+        });
+    });
   };
 
   const clearAwaitWatchList = async () => {
@@ -176,8 +163,6 @@ export const useUserStore = defineStore('user', () => {
         }
       });
 
-      window.chrome.runtime.sendMessage({ action: 'clearAlarm', clearAlarmName: EVERYDAY_AlARM_NAME });
-
       resolve();
     });
   };
@@ -185,9 +170,7 @@ export const useUserStore = defineStore('user', () => {
   return {
     user,
     setEveryDayInfo,
-    setAwaitWatchList,
     saveEveryDayInfo,
-    saveAwaitWatchList,
     getEveryDayInfo,
     getAwaitWatchList,
     clearEveryDayInfo,

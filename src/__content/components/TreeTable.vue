@@ -90,7 +90,7 @@ onMounted(() => {
 });
 
 onUnmounted(() => {
-  document.removeEventListener('mouseup', mouseDownHandler);
+  document.removeEventListener('mousedown', mouseDownHandler);
 });
 
 const getInsertItem = () => {

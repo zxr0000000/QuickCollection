@@ -39,6 +39,7 @@ const onMouseUp = (event) => {
 };
 
 const onMessage = (request) => {
+  console.log('监听到 background.js 发送到请求', request.action);
   if (request.action === 'close') {
     show.value = false;
   }
