@@ -3,8 +3,10 @@
 </template>
 
 <script setup>
+import 'uno.css'
 import { ref, onMounted, onUnmounted } from 'vue';
 import mainPage from '@/__content/views/mainPage.vue';
+import { hotkeyManager } from './common/hotkey/HotkeyManager';
 
 const show = ref(false);
 
@@ -49,6 +51,12 @@ const onMessage = (request) => {
 onMounted(() => {
   document.addEventListener('mousedown', onMouseDown);
   document.addEventListener('mouseup', onMouseUp);
+  hotkeyManager.addHotkeys([{
+    key: 'meta+i',
+    handler: () => {
+      show.value = true;
+    }
+  }])
   window.chrome.runtime.onMessage.addListener(onMessage);
 });
 
@@ -56,5 +64,6 @@ onUnmounted(() => {
   document.removeEventListener('mousedown', onMouseDown);
   document.removeEventListener('mouseup', onMouseUp);
   window.chrome.runtime.onMessage.removeListener(onMessage);
+  hotkeyManager.destroy()
 });
 </script>

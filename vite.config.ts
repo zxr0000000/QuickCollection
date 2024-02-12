@@ -2,6 +2,7 @@ import { defineConfig, loadEnv, type UserConfig } from 'vite';
 
 import vue from '@vitejs/plugin-vue';
 import compression from 'vite-plugin-compression';
+import UnoCSS from 'unocss/vite'
 import path from 'path';
 import { WebSocketServer, WebSocket } from 'ws';
 
@@ -51,7 +52,8 @@ export default defineConfig(({ mode }): UserConfig => {
         ext: '.gz',
         deleteOriginFile: false
       }),
-      refresh()
+      refresh(),
+      UnoCSS()
     ],
     define: {
       SOCKET_PORT: JSON.stringify(SOCKET_PORT)
@@ -67,6 +69,7 @@ export default defineConfig(({ mode }): UserConfig => {
     envPrefix: 'VITE_',
     server: {},
     build: {
+      minify:false,
       outDir: env.VITE_OUTDIR,
       emptyOutDir: true,
       rollupOptions: {

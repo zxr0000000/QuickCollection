@@ -1,5 +1,6 @@
 <template>
   <div
+    class="mt-8"
     style="position: fixed; top: 0; left: 0; display: flex; justify-content: center; align-items: center; z-index: 9999"
     :style="{
       width: `${pageWidth}px`,
@@ -11,7 +12,7 @@
         color: 'black';
         width: 80%;
         height: 50%;
-        border-radius: 4px;
+        border-radius: 40px;
         display: flex;
         justify-content: center;
         align-items: center;
