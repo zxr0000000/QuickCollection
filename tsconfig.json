@@ -21,7 +21,8 @@
     "paths": {
       "@/*": ["src/*"], //解决引入报错  找不到模块“@/xxxx” 或其相应的类型声明
       "@Project": ["src/Project/*"]
-    }
+    },
+    "experimentalDecorators": true
   },
   "include": [
     "scripts/**/*.ts",

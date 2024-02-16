@@ -45,7 +45,8 @@
         "<all_urls>"
       ],
       "resources": [
-        "content_main_script.js"
+        "content_main_script.js",
+        "css/content_main_script.css"
       ]
     },
     {
