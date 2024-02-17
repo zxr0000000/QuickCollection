@@ -69,8 +69,9 @@ export default defineConfig(({ mode }): UserConfig => {
     envPrefix: 'VITE_',
     server: {},
     build: {
-      minify:false,
+      minify: false,
       outDir: env.VITE_OUTDIR,
+      sourcemap: 'inline',
       emptyOutDir: true,
       rollupOptions: {
         input: inputModule,
