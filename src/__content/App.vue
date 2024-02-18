@@ -7,6 +7,19 @@ import 'uno.css'
 import { ref, onMounted, onUnmounted } from 'vue';
 import mainPage from '@/__content/views/mainPage.vue';
 import { hotkeyManager } from './common/hotkey/HotkeyManager';
+import { InstantiationService } from '@/store/modules/instantiationService'
+import { TestService } from '@/store/modules/pm'
+import { ServiceCollection } from '@/store/DI/serviceCollection';
+import { getSingletonServiceDescriptors } from '@/store/DI/extension';
+
+const serviceCollection = new ServiceCollection()
+const contributedServices = getSingletonServiceDescriptors();
+for (const [id, descriptor] of contributedServices) {
+  serviceCollection.set(id, descriptor);
+}
+const instantiationService = new InstantiationService(serviceCollection, true);
+instantiationService.createInstance(TestService);
+
 
 const show = ref(false);
 

@@ -1,6 +1,7 @@
 import { createApp } from 'vue';
 import App from './App.vue';
 import './index.css';
+import { createPinia } from 'pinia';
 const ID = '#bootmark';
 
 // 创建挂载点并为其创建Shadow Root
@@ -15,7 +16,7 @@ const appMountPoint = document.createElement('div');
 shadowRoot.appendChild(appMountPoint);
 
 // 创建Vue应用并挂载到Shadow DOM中
-const app = createApp(App);
+const app = createApp(App).use(createPinia());
 app.mount(appMountPoint);
 
 // 创建样式元素并将全局样式内容拼接进来

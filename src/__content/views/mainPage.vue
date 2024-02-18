@@ -25,6 +25,8 @@
       "
     >
       <tree-table />
+      {{ ins.$subManager.state.count }}
+
     </div>
   </div>
 </template>
@@ -32,6 +34,10 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import TreeTable from '@/__content/components/TreeTable.vue';
+import { PluginManager } from '@/store';
+
+const ins = PluginManager.useStoreDeclaration()
+console.log(ins.$subManager.state.count)
 
 const pageWidth = ref();
 const pageHeight = ref();
